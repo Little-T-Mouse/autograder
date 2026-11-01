@@ -460,6 +460,8 @@ const A1_PUBLIC_METHODS = [
   'DistanceMap.add_distance',
 
   'PriorityQueue.add',
+  'PriorityQueue.remove',
+  'PriorityQueue.is_empty',
 
   'Parcel.__init__',
 
