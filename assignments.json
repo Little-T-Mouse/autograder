@@ -1,0 +1,47 @@
+[
+  {
+    "id": "a1",
+    "title": "A1 \u00b7 Parcel Delivery Scheduler",
+    "description": "Additional student-written practice tests covering Tasks 1\u20135. Unofficial and independent from the course autograder.",
+    "status": "ready",
+    "requiredFiles": [
+      "container.py",
+      "distance_map.py",
+      "domain.py",
+      "scheduler.py",
+      "experiment.py"
+    ],
+    "testFiles": [
+      "tests/a1/test_a1_map_and_queue.py",
+      "tests/a1/test_a1_domain.py",
+      "tests/a1/test_a1_scheduling.py",
+      "tests/a1/test_a1_experiment.py"
+    ],
+    "hint": "Upload the five Python modules required for these practice tests. explore.py and generator.py are not needed."
+  },
+  {
+    "id": "demo",
+    "title": "Demo \u00b7 List Utilities",
+    "description": "Try the site with a tiny practice assignment before adding your CSC148 test files.",
+    "status": "ready",
+    "requiredFiles": [
+      "solution.py"
+    ],
+    "testFiles": [
+      "tests/demo/test_solution.py"
+    ],
+    "sampleFiles": [
+      "examples/solution.py"
+    ],
+    "hint": "Upload solution.py with the functions sum_positive(numbers) and has_duplicates(items)."
+  },
+  {
+    "id": "a2",
+    "title": "A2 \u00b7 Coming soon",
+    "description": "Add a new assignment and its corresponding tests when available.",
+    "status": "coming-soon",
+    "requiredFiles": [],
+    "testFiles": [],
+    "hint": ""
+  }
+]

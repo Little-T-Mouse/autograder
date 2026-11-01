@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Community-built practice tests for Python assignments. Upload your code and get instant feedback in your browser." />
+  <title>Practice Autograder · CSC148</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="wordmark" href="./" aria-label="Practice Autograder home"><span class="mark">{ }</span><span>practice<span class="muted-word">grader</span></span></a>
+      <span class="top-pill"><span class="online-dot"></span> Community test suite</span>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow">CSC148 · Student-built tools</div>
+        <h1>Catch bugs <span>before you submit.</span></h1>
+        <p>Run extra Python unit tests on your assignments. Upload your files, get detailed feedback, and debug with confidence.</p>
+        <div class="privacy-note"><span class="shield">✓</span><span>Tests run in a temporary browser worker on your device. Your files are not uploaded to this website's server.</span></div>
+      </section>
+
+      <div class="workspace">
+        <section class="panel editor-panel" aria-label="Submission setup">
+          <div class="section-top"><div class="step-num">01</div><h2>Choose your assignment</h2></div>
+          <p class="subtext">Each assignment has its own file requirements and extra tests.</p>
+          <label for="assignment" class="label">Assignment</label>
+          <select id="assignment" aria-describedby="assignmentDescription"><option value="">Loading assignments…</option></select>
+          <div class="assignment-summary" id="assignmentDescription"></div>
+
+          <div class="divider"></div>
+          <div class="section-top"><div class="step-num">02</div><h2>Upload your Python files</h2></div>
+          <p class="subtext" id="requiredDescription">Select an assignment to see required filenames.</p>
+          <label class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept=".py,text/x-python" multiple />
+            <span class="upload-icon" aria-hidden="true">↑</span>
+            <strong>Click to browse or drag files here</strong>
+            <span>Python files only (.py), up to 2 MB each</span>
+          </label>
+          <ul id="fileList" class="file-list" aria-live="polite"></ul>
+          <div class="actions">
+            <button type="button" id="runButton" class="primary-button" disabled><span class="play-icon">▶</span> Run practice tests</button>
+            <button type="button" id="sampleButton" class="secondary-button">Try demo</button>
+          </div>
+          <p class="fine-print">This is an unofficial practice tool, not a course submission service. Only upload code you are comfortable executing locally in your browser.</p>
+        </section>
+
+        <section class="panel results-panel" aria-label="Test results">
+          <div class="results-head"><div class="section-top"><div class="step-num">03</div><h2>Your feedback</h2></div><span class="status-pill" id="statusPill">Not started</span></div>
+          <div id="emptyState" class="empty-state"><div class="terminal-icon">&gt;_</div><h3>Ready when you are</h3><p>Choose an assignment, upload your files, then run the test suite. The results will appear here.</p></div>
+          <div id="runningState" class="running-state" hidden><div class="spinner"></div><h3>Running your tests</h3><p id="progressMessage" role="status">Preparing the Python environment…</p></div>
+          <div id="results" hidden><div class="score-area"><div><div class="score-number" id="scoreText">0 / 0</div><div class="score-caption">Tests passed</div></div><div class="score-rate" id="scoreRate">0%</div></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><div class="result-legend"><span id="passedCount">0 passed</span><span id="failedCount">0 failed</span><span id="skippedCount">0 skipped</span></div><div class="test-results" id="testResults"></div><details id="rawOutput" class="raw-output" hidden><summary>Full test runner output</summary><pre id="rawOutputText"></pre></details></div>
+          <div id="errorState" class="error-state" hidden><div class="error-glyph">!</div><h3>Could not complete tests</h3><p id="errorMessage"></p></div>
+        </section>
+      </div>
+      <section class="footer-note"><strong>Made for learning.</strong> Feedback is only as complete as the available tests. Passing all tests does not guarantee that your code is correct or that it meets the official grading requirements.</section>
+    </main>
+    <footer>Independent student project · Not affiliated with the University of Toronto</footer>
+  </div>
+</body>
+</html>
