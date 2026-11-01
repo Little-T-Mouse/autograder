@@ -12,15 +12,7 @@
       "experiment.py"
     ],
     "testFiles": [
-      "tests/a1/test_a1_map_and_queue.py",
-      "tests/a1/test_a1_domain.py",
-      "tests/a1/test_a1_scheduling.py",
-      "tests/a1/test_a1_experiment.py",
-      "tests/a1/test_a1_extended_distance.py",
-      "tests/a1/test_a1_extended_queue.py",
-      "tests/a1/test_a1_extended_domain.py",
-      "tests/a1/test_a1_extended_schedulers.py",
-      "tests/a1/test_a1_extended_experiment.py"
+      "tests/a1/test_a1_public_api.py"
     ],
     "hint": "Upload the five Python modules required for these practice tests. explore.py and generator.py are not needed."
   },
