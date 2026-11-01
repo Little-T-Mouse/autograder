@@ -613,3 +613,59 @@ def test_experiment_10_full_statistics_scenarios(
                 assert actual[key] == expected, (
                     key, actual[key], expected
                 )
+
+@pytest.mark.target_method("SchedulingExperiment.__init__")
+@pytest.mark.parametrize("case", range(10))
+def test_experiment_constructor_public_behavior(case, monkeypatch):
+    import experiment
+    from scheduler import GreedyScheduler, RandomScheduler
+
+    parcels, trucks, rows, distances, cities = _scenario(
+        case, count=1 + case * 15
+    )
+
+    options = (
+        ("volume", "destination")[case % 2],
+        ("non-decreasing", "non-increasing")[(case // 2) % 2],
+        ("non-decreasing", "non-increasing")[(case // 4) % 2]
+    )
+
+    algorithm = "random" if case in (3, 7, 9) else "greedy"
+
+    with _files(
+        experiment, parcels, trucks, rows
+    ) as (paths, root):
+
+        monkeypatch.chdir(root)
+
+        config = _config(
+            paths,
+            options=options,
+            algorithm=algorithm
+        )
+
+        e = experiment.SchedulingExperiment(config)
+
+        expected_scheduler = (
+            RandomScheduler
+            if algorithm == "random"
+            else GreedyScheduler
+        )
+
+        assert isinstance(e.scheduler, expected_scheduler)
+
+        assert len(e.parcels) == len(parcels)
+
+        assert e.fleet.num_trucks() == len(trucks)
+
+        assert e.fleet.num_nonempty_trucks() == 0
+
+        assert e.fleet.parcel_allocations() == {
+            tid: [] for tid, capacity in trucks
+        }
+
+        # Confirm that the constructor loaded the map.
+        a, b, forward, backward = rows[0]
+
+        assert e.dmap.distance(a, b) == forward
+        assert e.dmap.distance(b, a) == backward
