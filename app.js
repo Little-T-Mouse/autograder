@@ -452,11 +452,81 @@ function executeInWorker(
   });
 }
 
+
+const A1_PUBLIC_METHODS = [
+  'DistanceMap.distance',
+  'DistanceMap.add_distance',
+  'PriorityQueue.add',
+  'PriorityQueue.remove',
+  'PriorityQueue.is_empty',
+  'Truck.pack',
+  'Truck.fullness',
+  'Fleet.add_truck',
+  'Fleet.num_trucks',
+  'Fleet.num_nonempty_trucks',
+  'Fleet.parcel_allocations',
+  'Fleet.total_unused_space',
+  'Fleet.average_fullness',
+  'Fleet.total_distance_travelled',
+  'Fleet.average_distance_travelled',
+  'GreedyScheduler.schedule',
+  'RandomScheduler.schedule',
+  'SchedulingExperiment.run',
+  'read_parcels',
+  'read_distance_map',
+  'read_trucks',
+  'simple_check'
+];
+
+
+function renderOneTest(result) {
+  const item = document.createElement('div');
+  item.className = `test-result ${result.status}`;
+
+  const line = document.createElement('div');
+  line.className = 'test-line';
+
+  const dot = document.createElement('div');
+  dot.className = 'result-dot';
+  dot.textContent =
+    result.status === 'passed' ? '✓'
+    : result.status === 'skipped' ? '–'
+    : '✕';
+
+  const name = document.createElement('div');
+  name.className = 'test-name';
+  name.textContent = result.name;
+  name.title = result.path || '';
+
+  const status = document.createElement('span');
+  status.className = 'test-status';
+  status.textContent = result.status;
+
+  line.append(dot, name, status);
+  item.appendChild(line);
+
+  if (result.details) {
+    const details = document.createElement('details');
+    const summary = document.createElement('summary');
+
+    summary.textContent =
+      'View error and debugging information';
+
+    const pre = document.createElement('pre');
+    pre.textContent = result.details;
+
+    details.append(summary, pre);
+    item.appendChild(details);
+  }
+
+  return item;
+}
+
+
 function renderResults(report) {
   if (!report?.ok) {
     displayError(
-      report?.error ||
-      'The test runner encountered an unexpected error.'
+      report?.error || 'The test runner encountered an error.'
     );
     return;
   }
@@ -475,9 +545,7 @@ function renderResults(report) {
     `${passed} / ${total}`;
 
   document.querySelector('#scoreRate').textContent =
-    `${total
-      ? Math.round(passed / total * 100)
-      : 0}%`;
+    `${total ? Math.round(passed / total * 100) : 0}%`;
 
   document.querySelector('#progressFill').style.width =
     `${total ? passed / total * 100 : 0}%`;
@@ -491,66 +559,121 @@ function renderResults(report) {
   document.querySelector('#skippedCount').textContent =
     `${skipped} skipped`;
 
+  const hasFailures = failed > 0 || report.exitCode !== 0;
+
   statusPill.textContent =
-    failed > 0 || report.exitCode !== 0
-      ? 'Needs attention'
-      : 'All passed';
+    hasFailures ? 'Needs attention' : 'All passed';
 
   statusPill.classList.add(
-    failed > 0 || report.exitCode !== 0
-      ? 'failure'
-      : 'success'
+    hasFailures ? 'failure' : 'success'
   );
 
   testResults.replaceChildren();
 
+  // Organize results by their primary target method.
+  const groups = new Map();
+
+  if (selectedAssignment()?.id === 'a1') {
+    for (const method of A1_PUBLIC_METHODS) {
+      groups.set(method, []);
+    }
+  }
+
   for (const result of report.results ?? []) {
-    const item = document.createElement('div');
-    item.className = `test-result ${result.status}`;
+    const method = result.method || 'Other tests';
 
-    const line = document.createElement('div');
-    line.className = 'test-line';
-
-    const dot = document.createElement('div');
-    dot.className = 'result-dot';
-    dot.textContent =
-      result.status === 'passed'
-        ? '✓'
-        : result.status === 'skipped'
-          ? '–'
-          : '✕';
-
-    const name = document.createElement('div');
-    name.className = 'test-name';
-    name.textContent = result.name;
-    name.title = result.path;
-
-    const status = document.createElement('span');
-    status.className = 'test-status';
-    status.textContent = result.status;
-
-    line.append(dot, name, status);
-    item.appendChild(line);
-
-    if (result.details) {
-      const details = document.createElement('details');
-      const summary = document.createElement('summary');
-
-      summary.textContent =
-        'View error and debugging information';
-
-      const pre = document.createElement('pre');
-      pre.textContent = result.details;
-
-      details.append(summary, pre);
-      item.appendChild(details);
+    if (!groups.has(method)) {
+      groups.set(method, []);
     }
 
-    testResults.appendChild(item);
+    groups.get(method).push(result);
+  }
+
+  for (const [method, tests] of groups) {
+    const correct = tests.filter(
+      t => t.status === 'passed'
+    ).length;
+
+    const failures = tests.filter(
+      t => t.status === 'failed'
+    ).length;
+
+    const skippedTests = tests.filter(
+      t => t.status === 'skipped'
+    ).length;
+
+    // Collapsible method section
+    const section = document.createElement('details');
+    section.className = 'method-group';
+
+    // Automatically expand failed methods.
+    section.open = failures > 0;
+
+    const header = document.createElement('summary');
+    header.className = 'method-summary';
+
+    const methodName = document.createElement('span');
+    methodName.className = 'method-name';
+    methodName.textContent = method;
+
+    const counter = document.createElement('span');
+    counter.className = 'method-count';
+
+    if (tests.length === 0) {
+      counter.textContent = 'Not tested';
+    } else {
+      counter.textContent =
+        `${correct} / ${tests.length} passed`;
+
+      if (skippedTests) {
+        counter.textContent +=
+          ` · ${skippedTests} skipped`;
+      }
+    }
+
+    if (failures > 0) {
+      counter.classList.add('has-failures');
+    }
+
+    header.append(methodName, counter);
+    section.appendChild(header);
+
+    if (tests.length > 0) {
+      // Progress bar
+      const bar = document.createElement('div');
+      bar.className = 'method-progress';
+
+      const fill = document.createElement('div');
+      fill.className = 'method-progress-fill';
+
+      fill.style.width =
+        `${100 * correct / tests.length}%`;
+
+      bar.appendChild(fill);
+      section.appendChild(bar);
+
+      // Individual tests
+      const content = document.createElement('div');
+      content.className = 'method-tests';
+
+      for (const test of tests) {
+        content.appendChild(renderOneTest(test));
+      }
+
+      section.appendChild(content);
+    } else {
+      const note = document.createElement('p');
+      note.className = 'method-untested';
+      note.textContent =
+        'No dedicated practice test for this method yet.';
+
+      section.appendChild(note);
+    }
+
+    testResults.appendChild(section);
   }
 
   const raw = document.querySelector('#rawOutput');
-
   raw.hidden = !report.output;
 
   document.querySelector('#rawOutputText').textContent =
@@ -559,8 +682,7 @@ function renderResults(report) {
   if (!total) {
     const message = document.createElement('p');
     message.textContent =
-      'No tests were collected. Review the output and test configuration.';
-
+      'No tests were collected. Review the test configuration.';
     testResults.appendChild(message);
   }
 }
