@@ -1,4 +1,4 @@
-# CSC148 Practice Autograder — starter website
+# CSC148 Practice Autograder
 
 A **free static website** where students choose an assignment, upload `.py` files, and run your publicly distributed pytest tests in their own browsers via Pyodide. No Python backend, database, or user accounts required.
 
