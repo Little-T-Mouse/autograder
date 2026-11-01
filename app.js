@@ -453,14 +453,21 @@ function executeInWorker(
 }
 
 
+
 const A1_PUBLIC_METHODS = [
+  'DistanceMap.__init__',
   'DistanceMap.distance',
   'DistanceMap.add_distance',
+
   'PriorityQueue.add',
-  'PriorityQueue.remove',
-  'PriorityQueue.is_empty',
+
+  'Parcel.__init__',
+
+  'Truck.__init__',
   'Truck.pack',
   'Truck.fullness',
+
+  'Fleet.__init__',
   'Fleet.add_truck',
   'Fleet.num_trucks',
   'Fleet.num_nonempty_trucks',
@@ -469,13 +476,16 @@ const A1_PUBLIC_METHODS = [
   'Fleet.average_fullness',
   'Fleet.total_distance_travelled',
   'Fleet.average_distance_travelled',
+
   'GreedyScheduler.schedule',
   'RandomScheduler.schedule',
+
+  'SchedulingExperiment.__init__',
   'SchedulingExperiment.run',
+
   'read_parcels',
   'read_distance_map',
-  'read_trucks',
-  'simple_check'
+  'read_trucks'
 ];
 
 
