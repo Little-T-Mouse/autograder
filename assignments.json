@@ -2,7 +2,7 @@
   {
     "id": "a1",
     "title": "A1 \u00b7 Parcel Delivery Scheduler",
-    "description": "Additional student-written practice tests covering Tasks 1\u20135. Unofficial and independent from the course autograder.",
+    "description": "",
     "status": "ready",
     "requiredFiles": [
       "container.py",

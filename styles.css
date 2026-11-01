@@ -85,41 +85,53 @@ footer { border-top:1px solid var(--border);padding:24px 0 30px;color:#8e9ba7;fo
 [hidden] { display:none!important; }
 @media(max-width:780px) { .app-shell { padding:0 16px; }.hero { padding:40px 0 32px; } h1 { letter-spacing:-1.6px; }.workspace { grid-template-columns:1fr; }.panel { min-height:unset;padding:22px; }.results-panel { min-height:390px; }.empty-state { padding:75px 12px; }.top-pill { font-size:10px; } }
 
-/* Remove button beside uploaded files */
 
+/* Upload checklist */
+.required-files { margin: 14px 0 16px; padding: 15px; border: 1px solid #dce8ea; border-radius: 12px; background: #f7fafb; }
+.required-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:13px; }
+.required-counter { background:#e7f2f3; color:#006d74; border-radius:20px; padding:5px 9px; font-size:11px; font-weight:750; }
+.required-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; list-style:none; padding:0; margin:12px 0 0; }
+.required-item { display:flex; align-items:center; gap:7px; min-width:0; border-radius:8px; border:1px dashed #ced8df; background:#fff; padding:9px 10px; }
+.required-item.uploaded { border:1px solid #bce3d0; background:#effaf4; }
+.required-symbol { color:#94a3af; font-weight:800; font-size:14px; flex-shrink:0; }
+.required-item.uploaded .required-symbol { color:#0b8752; }
+.required-filename { min-width:0; overflow-wrap:anywhere; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:11px; font-weight:650; }
+.required-item-state { margin-left:auto; font-size:10px; color:#7b8792; flex-shrink:0; }
+.required-item.uploaded .required-item-state { color:#0b8752; }
+.required-message { margin:11px 0 0; font-size:12px; color:#647482; line-height:1.5; }
+.required-message.complete { color:#0b8752; }
+@media(max-width:530px) { .required-grid { grid-template-columns:1fr; } }
+
+/* Uploaded file chips and their remove buttons */
 .file-list li .remove-file {
-  border: none;
-  background: transparent;
-  color: #6f8190;
+  display: inline-grid;
+  place-items: center;
   width: 20px;
   height: 20px;
   padding: 0;
   margin-left: 2px;
+  border: none;
   border-radius: 5px;
+  background: transparent;
+  color: #6f8190;
   font-size: 17px;
   line-height: 1;
-  display: grid;
-  place-items: center;
   cursor: pointer;
 }
-
 .file-list li .remove-file:hover {
   color: var(--red);
   background: #ffe9ec;
 }
-
 .file-list li .remove-file:focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
 }
-
 .file-list li .remove-file:disabled {
-  cursor: not-allowed;
   opacity: 0.45;
+  cursor: not-allowed;
 }
 
-/* Upload validation messages */
-
+/* Filename validation and upload feedback */
 .upload-notice {
   margin: 6px 0 12px;
   font-size: 12px;
@@ -127,13 +139,7 @@ footer { border-top:1px solid var(--border);padding:24px 0 30px;color:#8e9ba7;fo
   color: #356f66;
   white-space: pre-line;
 }
-
-.upload-notice.error {
-  color: #b33d43;
-}
-
-/* Disabled upload area */
-
+.upload-notice.error { color: #b33d43; }
 .dropzone.unavailable {
   opacity: 0.55;
   cursor: not-allowed;
