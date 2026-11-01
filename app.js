@@ -17,6 +17,18 @@ const progressMessage = document.querySelector('#progressMessage');
 const errorMessage = document.querySelector('#errorMessage');
 const testResults = document.querySelector('#testResults');
 
+const uploadNotice = document.createElement('p');
+uploadNotice.className = 'upload-notice';
+uploadNotice.setAttribute('role', 'status');
+uploadNotice.hidden = true;
+fileList.after(uploadNotice);
+
+function setUploadNotice(message, isError = false) {
+  uploadNotice.textContent = message;
+  uploadNotice.classList.toggle('error', isError);
+  uploadNotice.hidden = !message;
+}
+
 const assignments = new Map();
 let uploads = new Map();
 let running = false;
@@ -46,6 +58,7 @@ function refreshAssignment() {
   const a = selectedAssignment();
   uploads = new Map();
   fileInput.value = '';
+  setUploadNotice('');
   renderFileList();
   if (!a) return;
   assignmentDescription.textContent = a.description;
@@ -59,49 +72,192 @@ function refreshAssignment() {
   updateRunButton();
 }
 
+
 function updateRunButton() {
   const a = selectedAssignment();
-  const missing = a?.requiredFiles.filter(f => !uploads.has(f)) ?? [];
-  runButton.disabled = running || !a || a.status !== 'ready' || uploads.size === 0 || missing.length > 0;
-  if (a?.status === 'ready' && missing.length > 0 && uploads.size > 0) {
-    requiredDescription.textContent = `Missing required file${missing.length > 1 ? 's' : ''}: ${missing.join(', ')}`;
-  } else if (a?.status === 'ready') {
-    requiredDescription.textContent = `Required: ${a.requiredFiles.join(', ')}. Other .py files are also accepted.`;
+  const ready = a?.status === 'ready';
+  const required = ready ? a.requiredFiles : [];
+  const missing = required.filter(name => !uploads.has(name));
+
+  const complete = ready &&
+    required.length > 0 &&
+    missing.length === 0 &&
+    uploads.size === required.length;
+
+  runButton.disabled = running || !complete;
+  fileInput.disabled = running || !ready;
+  assignmentSelect.disabled = running;
+
+  dropzone.classList.toggle('unavailable', fileInput.disabled);
+
+  fileList.querySelectorAll('.remove-file').forEach(button => {
+    button.disabled = running;
+  });
+
+  if (ready) {
+    const expected = `Required files: ${required.join(', ')}.`;
+
+    requiredDescription.textContent = complete
+      ? `All ${required.length} required files uploaded. Ready to run tests.`
+      : `${expected} Only these exact filenames are accepted. Missing: ${missing.join(', ')}.`;
   }
 }
+
 
 function renderFileList() {
   fileList.replaceChildren();
+
   for (const name of uploads.keys()) {
     const li = document.createElement('li');
-    li.textContent = name;
+
+    const label = document.createElement('span');
+    label.textContent = name;
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'remove-file';
+    removeButton.textContent = '×';
+    removeButton.title = `Remove ${name}`;
+    removeButton.setAttribute('aria-label', `Remove ${name}`);
+    removeButton.disabled = running;
+
+    removeButton.addEventListener('click', () => {
+      if (running) return;
+
+      uploads.delete(name);
+      fileInput.value = '';
+
+      // Previous test results no longer apply.
+      showState('empty');
+
+      renderFileList();
+      setUploadNotice(`${name} removed.`);
+    });
+
+    li.append(label, removeButton);
     fileList.appendChild(li);
   }
+
   updateRunButton();
 }
 
+
 async function addFiles(files) {
   if (running) return;
-  let issue = '';
-  for (const file of files) {
-    if (!file.name.endsWith('.py') || file.name.includes('/') || file.name.includes('\\') || file.name === '.' || file.name === '..') {
-      issue = 'Only files ending in .py are accepted.';
+
+  const a = selectedAssignment();
+
+  if (!a || a.status !== 'ready') {
+    setUploadNotice(
+      'This assignment is not accepting submissions yet.',
+      true
+    );
+    return;
+  }
+
+  const assignmentId = a.id;
+  const allowed = new Set(a.requiredFiles);
+
+  const rejected = [];
+  let accepted = 0;
+  let replaced = 0;
+
+  for (const file of Array.from(files)) {
+    const name = file.name;
+
+    // Only accept filenames required by this assignment.
+    // Filenames are case-sensitive.
+    if (!allowed.has(name)) {
+      rejected.push(
+        `${name}: not required for ${a.title}.`
+      );
       continue;
     }
+
+    // Validate Python filename.
+    if (!/^[A-Za-z0-9_.-]+\.py$/.test(name) ||
+        name.length > 120) {
+      rejected.push(
+        `${name}: invalid Python filename.`
+      );
+      continue;
+    }
+
+    // Limit each file to 2 MB.
     if (file.size > 2 * 1024 * 1024) {
-      issue = `${file.name} is too large. Maximum file size is 2 MB.`;
+      rejected.push(
+        `${name}: larger than the 2 MB per-file limit.`
+      );
       continue;
     }
-    const content = await file.text();
-    uploads.set(file.name, { name: file.name, content });
+
+    // Limit total submission to 5 MB.
+    const currentSize = [...uploads.values()].reduce(
+      (sum, uploaded) =>
+        sum + (uploaded.size ??
+          new Blob([uploaded.content]).size),
+      0
+    );
+
+    const previousSize = uploads.get(name)?.size ?? 0;
+
+    if (currentSize - previousSize + file.size >
+        5 * 1024 * 1024) {
+      rejected.push(
+        `${name}: would exceed the 5 MB total limit.`
+      );
+      continue;
+    }
+
+    try {
+      const content = await file.text();
+
+      // Ignore uploads if the assignment changed.
+      if (selectedAssignment()?.id !== assignmentId) {
+        return;
+      }
+
+      if (uploads.has(name)) {
+        replaced++;
+      }
+
+      uploads.set(name, {
+        name,
+        content,
+        size: file.size
+      });
+
+      accepted++;
+
+    } catch (error) {
+      rejected.push(
+        `${name}: could not read the file (${error.message}).`
+      );
+    }
   }
-  if (uploads.size > 30 || [...uploads.values()].reduce((sum, file) => sum + file.content.length, 0) > 5 * 1024 * 1024) {
-    uploads.clear();
-    issue = 'Maximum submission: 30 Python files, 5 MB total.';
+
+  // Reset previous feedback if code was changed.
+  if (accepted) {
+    showState('empty');
   }
+
   renderFileList();
-  if (issue) displayError(issue);
-  else showState('empty');
+
+  if (rejected.length) {
+    setUploadNotice(
+      `Rejected ${rejected.length} file(s):\n` +
+      rejected.join('\n') +
+      '\nUpload only the required files listed above.',
+      true
+    );
+
+  } else if (accepted) {
+    setUploadNotice(
+      `${accepted} file(s) accepted` +
+      (replaced ? ` (${replaced} replaced)` : '') +
+      '.'
+    );
+  }
 }
 
 async function loadText(path) {
