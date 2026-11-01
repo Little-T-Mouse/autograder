@@ -12,7 +12,8 @@
       "experiment.py"
     ],
     "testFiles": [
-      "tests/a1/test_a1_public_api.py"
+      "tests/a1/test_a1_core_public.py",
+      "tests/a1/test_a1_workflow_public.py"
     ],
     "hint": "Upload the five Python modules required for these practice tests. explore.py and generator.py are not needed."
   },
