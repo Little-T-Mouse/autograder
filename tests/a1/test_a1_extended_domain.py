@@ -41,7 +41,7 @@ def test_pack_boundary_and_no_mutation_on_failure(capacity, volumes, accepted):
 @pytest.mark.parametrize('names', [
     ['A-B', 'A-B', 'B-C'],
     ['A', 'B', 'A', 'A'],
-    ['Depot', 'Depot', 'A-B'],
+    ['W', 'X', 'W', 'Y'],
     ['X', 'X', 'X', 'X'],
     ['City-3', 'City-2', 'City-3'],
 ])
