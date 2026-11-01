@@ -144,3 +144,66 @@ footer { border-top:1px solid var(--border);padding:24px 0 30px;color:#8e9ba7;fo
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+
+/* Method-by-method test feedback */
+
+.method-group {
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+}
+
+.method-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.method-name {
+  font: 700 12px ui-monospace, SFMono-Regular,
+        Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.method-count {
+  color: #16845b;
+  background: #eaf7ef;
+  border-radius: 12px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.method-count.has-failures {
+  color: #a2383d;
+  background: #fff0f0;
+}
+
+.method-progress {
+  margin: 10px 0 0;
+  height: 5px;
+  border-radius: 10px;
+  background: #eaf0f3;
+  overflow: hidden;
+}
+
+.method-progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  background: #18a372;
+}
+
+.method-tests {
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 2px solid #e4edf0;
+}
+
+.method-untested {
+  font-size: 11px;
+  color: #72808c;
+  margin: 12px 0 2px;
+}
