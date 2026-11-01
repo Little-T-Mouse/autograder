@@ -3,7 +3,6 @@
 
 10 parameterized cases per targeted public method. No student's private
 attributes or arbitrary representation choices are inspected.
-Not official course tests.
 """
 import random
 import pytest
