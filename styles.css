@@ -84,3 +84,57 @@ h3 { margin:0 0 7px;font-size:16px;letter-spacing:-.2px; }
 footer { border-top:1px solid var(--border);padding:24px 0 30px;color:#8e9ba7;font-size:11px;text-align:center; }
 [hidden] { display:none!important; }
 @media(max-width:780px) { .app-shell { padding:0 16px; }.hero { padding:40px 0 32px; } h1 { letter-spacing:-1.6px; }.workspace { grid-template-columns:1fr; }.panel { min-height:unset;padding:22px; }.results-panel { min-height:390px; }.empty-state { padding:75px 12px; }.top-pill { font-size:10px; } }
+
+/* Remove button beside uploaded files */
+
+.file-list li .remove-file {
+  border: none;
+  background: transparent;
+  color: #6f8190;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin-left: 2px;
+  border-radius: 5px;
+  font-size: 17px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.file-list li .remove-file:hover {
+  color: var(--red);
+  background: #ffe9ec;
+}
+
+.file-list li .remove-file:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.file-list li .remove-file:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* Upload validation messages */
+
+.upload-notice {
+  margin: 6px 0 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #356f66;
+  white-space: pre-line;
+}
+
+.upload-notice.error {
+  color: #b33d43;
+}
+
+/* Disabled upload area */
+
+.dropzone.unavailable {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
